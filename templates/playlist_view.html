@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ playlist.name }} - Spotify Clone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+
+    <style>
+      .play-btn {
+        background-color: #1db954 !important;
+        border: none !important;
+        color: white !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+
+      .play-btn:hover {
+        background-color: #1ed760 !important;
+        transform: scale(1.05);
+      }
+
+      .hover-bg-card:hover .play-btn {
+        opacity: 1 !important;
+      }
+    </style>
+  </head>
+  <body>
+    {% include 'navbar.html' %}
+
+    <div class="wrapper">
+      <nav class="sidebar d-none d-md-flex">
+        <div class="mb-4">
+          <a
+            href="{{ url_for('home') }}"
+            class="text-white text-decoration-none"
+          >
+            <i class="fa-solid fa-arrow-left me-2"></i> Back to Home
+          </a>
+        </div>
+
+        <div class="sidebar-section">
+          <h2 class="fw-bold mb-1">{{ playlist.name }}</h2>
+          <p class="text-gray small">{{ playlist.songs|length }} Songs</p>
+        </div>
+      </nav>
+      <main class="main-view p-4">
+        <div class="d-flex align-items-end gap-4 mb-5">
+          <div
+            class="shadow-lg"
+            style="
+              width: 180px;
+              height: 180px;
+              background: linear-gradient(135deg, #450af5, #c4efd9);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            <i class="fa-solid fa-music fa-4x text-white"></i>
+          </div>
+
+          <div>
+            <p class="small fw-bold mb-1">PLAYLIST</p>
+            <h1 class="fw-bold display-4 mb-2">{{ playlist.name }}</h1>
+            <p class="text-gray small">
+              Created by You • {{ playlist.songs|length }} songs
+            </p>
+          </div>
+        </div>
+        <div class="container-fluid px-0">
+          <div
+            class="row text-gray border-bottom border-secondary pb-2 mb-3 small text-uppercase"
+          >
+            <div class="col-1">#</div>
+            <div class="col-7">Title</div>
+            <div class="col-4">Artist</div>
+          </div>
+          {% for song in playlist.songs %}
+          <div class="row align-items-center hover-bg-card p-2 rounded group">
+            <div class="col-1 text-gray">{{ loop.index }}</div>
+            <div class="col-7 d-flex align-items-center gap-3">
+              <button
+                class="btn btn-sm btn-success rounded-circle play-btn"
+                style="
+                  width: 32px;
+                  height: 32px;
+                  z-index: 10;
+                  position: relative;
+                "
+                data-src="{{ url_for('static', filename='audio/' + song.filename) }}"
+                data-title="{{ song.title }}"
+                data-artist="{{ song.artist }}"
+                data-img="{{ url_for('static', filename='images/' + song.image) }}"
+              >
+                <i class="fa-solid fa-play small"></i>
+              </button>
+              <img
+                src="{{ url_for('static', filename='images/' + song.image) }}"
+                width="40"
+                height="40"
+                class="rounded"
+                style="object-fit: cover"
+              />
+              <div class="text-white fw-bold">{{ song.title }}</div>
+            </div>
+            <div class="col-4 text-gray small">{{ song.artist }}</div>
+          </div>
+
+          {% else %}
+          <div class="text-center text-gray py-5">
+            <h4>This playlist is empty</h4>
+            <p>Go back to home and add some songs!</p>
+            <a
+              href="{{ url_for('home') }}"
+              class="btn btn-light rounded-pill fw-bold px-4 mt-3"
+              >Find Songs</a
+            >
+          </div>
+          {% endfor %}
+        </div>
+      </main>
+    </div>
+
+    {% include 'music-player.html' %}
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const audioPlayer = document.getElementById("audio-player");
+        const playButtons = document.querySelectorAll(".play-btn");
+
+        let currentPlayingButton = null;
+
+        playButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const src = this.getAttribute("data-src");
+            const currentIcon = this.querySelector("i");
+            if (currentPlayingButton === this && !audioPlayer.paused) {
+              audioPlayer.pause();
+              currentIcon.classList.remove("fa-pause");
+              currentIcon.classList.add("fa-play");
+              currentPlayingButton = null;
+              return;
+            }
+            if (currentPlayingButton && currentPlayingButton !== this) {
+              const prevIcon = currentPlayingButton.querySelector("i");
+              if (prevIcon) {
+                prevIcon.classList.remove("fa-pause");
+                prevIcon.classList.add("fa-play");
+              }
+            }
+            if (audioPlayer.src !== src) {
+              audioPlayer.src = src;
+            }
+            audioPlayer.play();
+            currentIcon.classList.remove("fa-play");
+            currentIcon.classList.add("fa-pause");
+
+            currentPlayingButton = this;
+          });
+        });
+        audioPlayer.addEventListener("ended", function () {
+          if (currentPlayingButton) {
+            const icon = currentPlayingButton.querySelector("i");
+            if (icon) {
+              icon.classList.remove("fa-pause");
+              icon.classList.add("fa-play");
+            }
+          }
+          currentPlayingButton = null;
+        });
+      });
+    </script>
+  </body>
+</html>
