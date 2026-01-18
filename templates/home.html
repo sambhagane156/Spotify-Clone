@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Spotify - Web Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+
+  <body>
+    {% include 'navbar.html' %}
+
+    <div class="wrapper">
+      <nav class="sidebar d-none d-md-flex">
+        <div
+          class="d-flex justify-content-between align-items-center px-3 mb-3 text-gray"
+        >
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-book-open"></i>
+            <span class="fw-bold">Your Library</span>
+          </div>
+          <i
+            class="fa-solid fa-plus cursor-pointer hover-white"
+            onclick="openPlaylistModal()"
+            title="Create Playlist"
+          ></i>
+        </div>
+
+        <div class="sidebar-section">
+          <h6>Create your first playlist</h6>
+          <p class="small text-secondary mb-2">
+            It's easy, we'll help you
+          </p>
+          <button
+            class="btn btn-light rounded-pill btn-sm fw-bold"
+            onclick="openPlaylistModal()"
+          >
+            Create playlist
+          </button>
+        </div>
+        <div class="mt-3 px-3">
+
+          {% if playlists %}
+          <p class="small text-gray fw-bold mb-2" id="playlist-header">
+            MY PLAYLISTS
+          </p>
+          {% endif %}
+
+          <ul class="list-unstyled" id="playlist-list">
+            {% for playlist in playlists %}
+            <li class="mb-2">
+              <a
+                href="{{ url_for('view_playlist', playlist_id=playlist.id) }}"
+                class="text-gray text-decoration-none hover-white small"
+              >
+                {{ playlist.name }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div class="sidebar-footer">
+          <a href="#">Legal</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Cookies</a>
+        </div>
+      </nav>
+      <main class="main-view">
+        <div class="top-bar d-flex justify-content-between px-3 mb-4">
+          <div class="d-flex gap-2">
+            <button class="btn btn-dark rounded-circle" onclick="history.back()">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button class="btn btn-dark rounded-circle" onclick="history.forward()">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+          <button class="btn btn-light rounded-pill fw-bold px-4">
+            Log in
+          </button>
+        </div>
+        <h4 class="fw-bold mb-3">Trending Songs</h4>
+
+        <div
+          class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3"
+        >
+          {% for song in songs %}
+          <div class="col">
+            <div class="spotify-card position-relative group">
+
+              <div class="card-img-container">
+                <img
+                  src="{{ url_for('static', filename='images/' + song.image) }}"
+                  class="card-img"
+                  alt="{{ song.title }}"
+                />
+
+                <button
+                  class="play-btn"
+                  data-src="{{ url_for('static', filename='audio/' + song.filename) }}"
+                  data-title="{{ song.title }}"
+                  data-artist="{{ song.artist }}"
+                  data-img="{{ url_for('static', filename='images/' + song.image) }}"
+                >
+                  <i class="fa-solid fa-play"></i>
+                </button>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-start">
+
+                <div>
+                  <h6
+                    class="fw-bold mt-2 text-truncate text-white"
+                    style="max-width: 140px"
+                  >
+                    {{ song.title }}
+                  </h6>
+                  <p class="small text-secondary text-truncate">
+                    {{ song.artist }}
+                  </p>
+                </div>
+                <div class="dropdown mt-2">
+                  <button
+                    class="btn btn-link text-gray p-0"
+                    data-bs-toggle="dropdown"
+                  >
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                  </button>
+
+                  <ul class="dropdown-menu dropdown-menu-dark">
+                    <li>
+                      <h6 class="dropdown-header">Add to Playlist</h6>
+                    </li>
+
+                    {% for playlist in playlists %}
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="#"
+                        onclick="addToPlaylist('{{ playlist.id }}', '{{ song.id }}')"
+                      >
+                        {{ playlist.name }}
+                      </a>
+                    </li>
+                    {% endfor %}
+
+                    {% if not playlists %}
+                    <li id="no-playlist-msg">
+                      <span class="dropdown-item disabled small">
+                        No playlists created
+                      </span>
+                    </li>
+                    {% endif %}
+                  </ul>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <h4 class="fw-bold mt-5 mb-3">Popular Artists</h4>
+
+        <div
+          class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3"
+        >
+          {% for artist in artists %}
+          <div class="col">
+            <div class="spotify-card text-center">
+
+              <div class="card-img-container">
+                <img
+                  src="{{ url_for('static', filename='images/' + artist.img) }}"
+                  class="card-img rounded-circle"
+                  alt="{{ artist.name }}"
+                />
+                <button class="play-btn">
+                  <i class="fa-solid fa-play"></i>
+                </button>
+              </div>
+
+              <h6 class="fw-bold mt-2">{{ artist.name }}</h6>
+              <p class="small text-muted">Artist</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+      </main>
+    </div>
+
+   {% include 'music-player.html' %}
+    <div class="modal fade" id="playlistModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+
+          <div class="modal-header border-bottom-0">
+            <h5 class="modal-title fw-bold">Create New Playlist</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <input
+              type="text"
+              id="newPlaylistName"
+              class="form-control bg-secondary text-white border-0"
+              placeholder="My Playlist #1"
+            />
+          </div>
+
+          <div class="modal-footer border-top-0">
+            <button
+              type="button"
+              class="btn btn-text text-white fw-bold"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-success rounded-pill fw-bold px-4"
+              onclick="createPlaylist()"
+            >
+              Create
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+</html>

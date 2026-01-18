@@ -1,0 +1,93 @@
+
+    <audio id="audio-player"></audio>
+
+    <div class="music-player">
+
+      <div class="song-info">
+        <div class="album-art">
+          <img
+            id="player-img"
+            src="https://via.placeholder.com/56/333333/FFFFFF?text=Music"
+            alt="Album Art"
+          />
+        </div>
+        <div class="track-details">
+          <h4 id="player-title">Song Title</h4>
+          <p id="player-artist">Artist Name</p>
+        </div>
+        <i class="fa-regular fa-heart like-icon"></i>
+      </div>
+
+      <div class="player-controls">
+
+        <div class="control-buttons">
+          <button class="control-btn">
+            <i class="fa-solid fa-shuffle"></i>
+          </button>
+
+          <button class="control-btn" id="prev-btn">
+            <i class="fa-solid fa-backward-step fa-lg"></i>
+          </button>
+
+          <button class="control-btn play-pause-btn" id="play-pause-btn">
+            <i class="fa-solid fa-play" id="play-icon"></i>
+          </button>
+
+          <button class="control-btn" id="next-btn">
+            <i class="fa-solid fa-forward-step fa-lg"></i>
+          </button>
+
+          <button class="control-btn">
+            <i class="fa-solid fa-repeat"></i>
+          </button>
+        </div>
+
+        <div class="playback-bar">
+          <span id="current-time">0:00</span>
+
+          <div class="progress-container">
+            <div class="progress-fill" id="progress-fill">
+              <div class="progress-handle"></div>
+            </div>
+
+            <input
+              type="range"
+              class="range-input"
+              id="seek-slider"
+              min="0"
+              max="100"
+              value="0"
+              step="0.1"
+            />
+          </div>
+
+          <span id="total-duration">0:00</span>
+        </div>
+
+      </div>
+
+      <div class="volume-controls">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <button class="control-btn" id="mute-btn">
+            <i class="fa-solid fa-volume-high" id="volume-icon"></i>
+          </button>
+
+          <div class="volume-slider-container">
+            <div class="volume-fill" style="width: 100%">
+              <div class="volume-handle"></div>
+            </div>
+
+            <input
+              type="range"
+              class="range-input"
+              id="volume-slider"
+              min="0"
+              max="1"
+              step="0.01"
+              value="1"
+            />
+          </div>
+        </div>
+      </div>
+
+    </div>
